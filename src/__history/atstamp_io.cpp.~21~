@@ -1,0 +1,105 @@
+// Checks status of push button connected to P2.0  (active low)
+// When pushed, LED connected to P1.0 flashes five times
+#include "ATSTAMP.h"
+#include <stdio.h>
+#include <conio.h>
+#include <windows.h>
+
+char* ic_name = "";
+char ic_recognized = 0;
+
+void test_7432() {
+	// 2-Input OR Gate
+	char input_1 = P1^0; char input_2 = P1^1; char output_1 = P1^2;
+	char input_3 = P1^3; char input_4 = P1^4; char output_2 = P1^5;
+	char input_5 = P2^5; char input_6 = P2^4; char output_3 = P2^3;
+	char input_7 = P2^2; char input_8 = P2^1; char output_4 = P2^0;
+
+	ic_recognized = 1;
+
+	//---------------Gate 01---------------
+
+	// Test 01
+	setb(P1, 0); setb(P1, 1);
+	if(!GetBit(P1, 2)) ic_recognized = 0;
+
+	// Test 02
+	setb(P1, 0); clr(P1, 1);
+	if(!GetBit(P1, 2)) ic_recognized = 0;
+
+	// Test 03
+	clr(P1, 0); setb(P1, 1);
+	if(!GetBit(P1, 2)) ic_recognized = 0;
+
+	// Test 04
+	clr(P1, 0); clr(P1, 1);
+	if(GetBit(P1, 2)) ic_recognized = 0;
+
+	//---------------Gate 02---------------
+
+    // Test 01
+	setb(P1, 3); setb(P1, 4);
+	if(!GetBit(P1, 5)) ic_recognized = 0;
+
+	// Test 02
+	setb(P1, 3); clr(P1, 4);
+	if(!GetBit(P1, 5)) ic_recognized = 0;
+
+	// Test 03
+	clr(P1, 3); setb(P1, 4);
+	if(!GetBit(P1, 5)) ic_recognized = 0;
+
+	// Test 04
+	clr(P1, 3); clr(P1, 4);
+	if(GetBit(P1, 5)) ic_recognized = 0;
+
+	//-----------------End-----------------
+
+	if(ic_recognized) ic_name = "7432";
+
+}
+
+void test_7404() {
+	// Invertor (NOT Gate)
+}
+
+void test_7402() {
+	// 2-Input NOR Gate
+}
+
+void test_7400() {
+    // 2-Input NAND Gate
+}
+
+int main()
+{
+	if(!OpenCom(3, 115200))
+	{
+		exit(0);
+	}
+
+
+
+	while(1) {
+		ic_recognized = 0;
+
+		test_7400();
+		test_7402();
+		test_7404();
+		test_7432();
+
+		if(ic_recognized) {
+			printf("%s IC is recognized.\n", ic_name);
+		}
+		else {
+			printf("No IC is recognized.\n");
+        }
+
+		Sleep(3000);
+    }
+}
+
+
+
+
+
